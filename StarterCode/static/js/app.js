@@ -2,92 +2,61 @@
 var tableData = data;
 
 
-//selecting the ufo-table
+// Referece for tbody
 
-var ufoTable = d3.select('#ufo-table');
-
-var columns = ['datetime','city', 'state', 'country', 'shape', 'durationMinutes', 'comments' ];
-
-var tbody = ufoTable.append('tbody');
+var tbody = d3.select("#ufo-table>tbody"); 
 
 
-// create a row for each object in the table
+tableData.forEach(function(ufoData) {
 
-var rows = tbody.selectAll('tr')
+    var row = tbody.append('tr');
 
-        .data(tableData)
+    Object.entries(ufoData).forEach(([key, value])=> {
 
-        .enter()
-
-        .append('tr');
-
-
-// create a cell for each row  
-
-var cells = rows.selectAll('td')
-
-            .data( function(row){
-
-                return columns.map(function(column){
-
-                    return {column: column, value: row[column]}
-                })
-            })
-
-            //input the data
-
-            .enter()
-
-            .append('td')
-
-            .text(function(d,i){
-
-                return d.value;
-                
-            });
-
-      
-
-// Select the submit button
-
-var submit = d3.select("#filter-btn");
-
-submit.on("click", function() {
-
-    // Prevent the page from refreshing
-
-    d3.event.preventDefault();
-
-    // Select the input element and get the raw HTML node
-
-    var inputElement = d3.select("#datetime");
-
-    var inputValue = inputElement.property("value");
-
-    //trying to match the inputted value with that in the stored data
-
-    var filteredData = tableData.filter(data => data.datetime === inputValue);
-
-    console.log(filteredData);
-
-
-    //clears to webpage output
-
-    tbody.selectAll('tr').remove();
-
-    //inputs the filtered data into the table
-
-    filteredData.forEach(function(obj){
-
-        var rows = tbody.append("tr");
-
-        Object.keys(obj).forEach(function(key){
-
-            rows.append("td").text(obj[key]);
-
-        })
+        row.append('td').text(value);
 
     })
 
 });
 
+
+
+// * Use a date form in your HTML document and write JavaScript code that will listen for events and search through the 
+//  `date/time` column to find rows that match user input.
+
+var button = d3.select("#filter-btn");
+
+// Attach event on selected element to event handler function
+
+button.on("click", eventHandler);
+
+
+function eventHandler() {
+
+    d3.event.preventDefault();
+
+    inputDate = d3.select(".form-control").node().value;
+
+    console.log(inputDate);
+
+    tbody.html("")
+
+    filteredData = tableData.filter(data=> data.datetime === inputDate);
+
+    console.log(filteredData);
+
+    if (Object.keys(filteredData).length === 0) {
+
+        tbody.html("<tr><td>Date out of range [1/1/2010 - 1/13/2010]</td></tr>");
+
+    } else {
+
+    filteredData.forEach(data=> {
+
+        var row = tbody.append('tr');
+
+        Object.values(data).forEach(val=> row.append('td').text(val));
+
+    })}; 
+
+}
